@@ -1,5 +1,5 @@
 from engine.tensor import Tensor
-
+import numpy as np
 class ZeroGrad:
     def zero_grad(self):
         for p in self.parameters():
@@ -16,9 +16,9 @@ class Neuron(ZeroGrad):
         self.bias = Tensor(np.random.normal())
         if activation:
             self.activation = activation.lower()
-    
+
     def __call__(self, x):
-        out = sum((x*w for x,w in zip(x,self.weight))) + self.bias
+        out = sum((x * w for x, w in zip(x, self.weight))) + self.bias
         if self.activation:
             if self.activation == 'relu':
                 out = out.relu()
@@ -30,10 +30,12 @@ class Neuron(ZeroGrad):
 
     def parameters(self):
         parameters = self.weight + [self.bias]
-        return parameters 
+        return parameters
+
 
 class Layer(ZeroGrad):
     layerdict = {'relu': 'ReLU', 'tanh': 'Tanh', 'sigmoid': 'Sigmoid'}
+
     def __init__(self, size=tuple(), activation=None):
         """"
         inx: number of input to the neuron
@@ -42,9 +44,9 @@ class Layer(ZeroGrad):
         """
         self.activation = activation
         self.shape = size
-        self.neurons = [Neuron(size[0],activation=activation) for _ in range(size[1])]       
+        self.neurons = [Neuron(size[0], activation=activation) for _ in range(size[1])]
         self.totalparam = len(self.parameters())
-        
+
     def __call__(self, x):
         out = [n(x) for n in self.neurons]
         return out[0] if len(out) < 2 else out
@@ -55,7 +57,7 @@ class Layer(ZeroGrad):
 
     def __repr__(self):
         return f"{'Linear' if not self.activation else Layer.layerdict[self.activation.lower()]}Layer       Shape: {self.shape})      Params: {self.totalparam}"
-        
+
 
 class Sequential(ZeroGrad):
     def __init__(self, layers):
@@ -66,14 +68,14 @@ class Sequential(ZeroGrad):
         for layer in self.layers:
             x = layer(x)
         return x
-    
+
     def parameters(self):
         param = [p for layer in self.layers for p in layer.parameters()]
-        return param 
-    
+        return param
+
     def summary(self):
         summary = self.__repr__()
-        print(summary) 
+        print(summary)
 
     def __repr__(self):
         layout = "Layer(type)         Shape              Parameters"
