@@ -204,6 +204,9 @@ class Tensor:
     def __rtruediv__(self, other):
         return self * (other ** -1)
 
+    def __rsub__(self, other):
+        return self + (-other)
+    
     def __repr__(self):
         """
         Return a string representation of the Tensor object.
