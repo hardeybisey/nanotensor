@@ -14,17 +14,17 @@ class Neuron(ZeroGrad):
         """
         self.weight = [Tensor(np.random.normal()) for _ in range(inx)]
         self.bias = Tensor(np.random.normal())
-        if activation:
-            self.activation = activation.lower()
+        self.activation = activation
 
     def __call__(self, x):
         out = sum((x * w for x, w in zip(x, self.weight))) + self.bias
         if self.activation:
-            if self.activation == 'relu':
+            activation = self.activation.lower()
+            if activation == 'relu':
                 out = out.relu()
-            elif self.activation == 'tanh':
+            elif activation == 'tanh':
                 out = out.tanh()
-            elif self.activation == 'sigmoid':
+            elif activation == 'sigmoid':
                 out = out.sigmoid()
         return out
 
