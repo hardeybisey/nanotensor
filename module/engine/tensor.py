@@ -15,19 +15,9 @@ class Tensor:
         The operation performed on this tensor. Defaults to an empty string.
     dtype : type, optional
         The data type of the tensor. Defaults to None.
-
-    Attributes:
-    -----------
-    data : float
-        The numerical value of the tensor.
     grad : float
         The gradient of the tensor with respect to the loss.
-    _downstream : tuple of Tensors
-        Tensors that depend on this tensor.
-    _op : str
-        The operation performed on this tensor.
     """
-
     def __init__(self, data, _downstream=tuple(), _op='', dtype=None):
         """
         Initialize a Tensor object.
