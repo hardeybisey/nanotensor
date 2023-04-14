@@ -135,6 +135,10 @@ class Tensor:
         return out
 
     def exp(self):
+        """
+        Returns:
+            Tensor: A new tensor representing the exponential function of this tensor.
+        """
         x = np.exp(self.data)
         out = Tensor(data=x, _downstream=(self,), _op='exp')
 
@@ -144,22 +148,41 @@ class Tensor:
         out._backward = _backward
         return out
 
+    def log(self):
+        """
+        Returns:
+            Tensor: A new tensor representing the log of this tensor.
+        """
+        x = np.log(self.data)
+        out = Tensor(data=x, _downstream=(self,), _op='log')
+        def _backward():
+            self.grad += out.data *  1/self.data
+        out._backward = _backward
+        return out
+
     def backward(self):
+        """
+        Returns:
+            calculated the gradients of all downstream element of a given tensor.
+        """
         nodes = self.__allnodes()
         self.grad = 1
         for node in nodes:
             node._backward()
 
     def __allnodes(self):
+        """
+        Returns:
+            list: A list of downstream elements that produced the current tensor 
+             in a chronological order.
+        """
         nodes = []
-
         def get_downstream(object, visited=set()):
             if object not in visited:
                 visited.add(object)
                 nodes.append(object)
                 for children in object._downstream:
                     get_downstream(children)
-
         get_downstream(self)
         return nodes
 
