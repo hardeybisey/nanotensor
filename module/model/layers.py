@@ -55,6 +55,16 @@ class Layer(ZeroGrad):
         param = [p for neuron in self.neurons for p in neuron.parameters()]
         return param
 
+    def softmax(self, x):
+        # HOO HOO, had to come up with a way to implement an operaion that supports from broadcasting
+        """
+        Compute the softmax of vector x in a numerically stable way.
+        """
+        _max = max((i.data for i in x))
+        exp_x = np.exp(x - np.array(_max))
+        exp_x = exp_x/ np.sum(exp_x, axis=0)
+        return exp_x 
+    
     def __repr__(self):
         return f"{'Linear' if not self.activation else Layer.layerdict[self.activation.lower()]}Layer       Shape: {self.shape})      Params: {self.totalparam}"
 
