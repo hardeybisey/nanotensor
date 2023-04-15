@@ -1,4 +1,4 @@
-from nanotensor.module.engine.tensor import Tensor
+from module.engine.tensor import Tensor
 import numpy as np
 
 
