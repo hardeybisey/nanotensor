@@ -206,6 +206,18 @@ class Tensor:
 
     def __rsub__(self, other):
         return self + (-other)
+
+    def __ge__(self, other):
+        other = other if isinstance(other, Tensor) else Tensor(other)
+        return self.data == other.data
+    
+    def __ge__(self, other):
+        other = other if isinstance(other, Tensor) else Tensor(other)
+        return self.data >= other.data
+    
+    def __lt__(self, other):
+        other = other if isinstance(other, Tensor) else Tensor(other)
+        return self.data <= other.data
     
     def __repr__(self):
         """
