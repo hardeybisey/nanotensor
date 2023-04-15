@@ -2,22 +2,7 @@ import numpy as np
 
 
 class Tensor:
-    """
-    A class representing a tensor with a single numerical value.
-
-    Parameters:
-    -----------
-    data : int or float
-        The numerical value of the tensor.
-    _downstream : tuple of Tensors, optional
-        Tensors that depend on this tensor. Defaults to an empty tuple.
-    _op : str, optional
-        The operation performed on this tensor. Defaults to an empty string.
-    dtype : type, optional
-        The data type of the tensor. Defaults to None.
-    grad : float
-        The gradient of the tensor with respect to the loss.
-    """
+    
     def __init__(self, data, _downstream=tuple(), _op='', dtype=None):
         """
         Initialize a Tensor object.
@@ -111,26 +96,12 @@ class Tensor:
         Returns:
             Tensor: A new tensor representing the hyperbolic tangent of this tensor.
         """
-        t = (np.exp(2 * self.data) - 1) / (np.exp(2 * self.data) + 1)
+        x = self.data
+        t = (np.exp(2*x) - 1) / (np.exp(2 * x) + 1)
         out = Tensor(data=t, _downstream=(self,), _op='tanh')
 
         def _backward():
-            self.grad += (1 - out.data ** 2) * out.grad
-
-        out._backward = _backward
-        return out
-
-    def sigmoid(self):
-        """
-        Returns:
-            Tensor: A new tensor representing the sigmoid function of this tensor.
-        """
-        s = 1 / (1 + np.exp(-self.data))
-        out = Tensor(data=s, _downstream=(self,), _op='sigmoid')
-
-        def _backward():
-            self.grad = out.data * (1 - out.data)
-
+            self.grad += (1 - t ** 2) * out.grad
         out._backward = _backward
         return out
 
@@ -139,52 +110,56 @@ class Tensor:
         Returns:
             Tensor: A new tensor representing the exponential function of this tensor.
         """
-        x = np.exp(self.data)
-        out = Tensor(data=x, _downstream=(self,), _op='exp')
+        x = self.data
+        out = Tensor(data= np.exp(x), _downstream=(self,), _op='exp')
 
         def _backward():
             self.grad += out.data * out.grad
-
         out._backward = _backward
         return out
 
-    def log(self):
+    def sigmoid(self):
         """
         Returns:
+            Tensor: A new tensor representing the sigmoid function of this tensor.
+        """
+        x = self.data
+        s = 1 / (1 + np.exp(-x))
+        out = Tensor(data=s, _downstream=(self,), _op='sigmoid')
+        
+        def _backward():
+            self.grad = out.data * (1 - out.data)
+
+        out._backward = _backward
+        return out
+    
+    def log(self, eps=1e-15):
+        """
+        Returns:
+            ## Only used for the log loss function
             Tensor: A new tensor representing the log of this tensor.
         """
-        x = np.log(self.data)
-        out = Tensor(data=x, _downstream=(self,), _op='log')
+        # x = Tensor(eps) if self < 0 else self - eps if self == 1 else self
+        x = self.data
+        out = Tensor(data= np.log(x), _downstream=(self,), _op='log')
+        
         def _backward():
             self.grad += out.data *  1/self.data
         out._backward = _backward
         return out
 
     def backward(self):
-        """
-        Returns:
-            calculated the gradients of all downstream element of a given tensor.
-        """
-        nodes = self.__allnodes()
-        self.grad = 1
-        for node in nodes:
-            node._backward()
-
-    def __allnodes(self):
-        """
-        Returns:
-            list: A list of downstream elements that produced the current tensor 
-             in a chronological order.
-        """
         nodes = []
         def get_downstream(object, visited=set()):
-            if object not in visited:
-                visited.add(object)
+            if str(object) not in visited:
+                visited.add(str(object))
                 nodes.append(object)
                 for children in object._downstream:
                     get_downstream(children)
         get_downstream(self)
-        return nodes
+        self.grad = 1
+        for node in nodes:
+            node._backward()
 
     def __neg__(self):
         return self * -1
@@ -207,20 +182,28 @@ class Tensor:
     def __rsub__(self, other):
         return self + (-other)
 
-    def __ge__(self, other):
+    def __eq__(self, other):
         other = other if isinstance(other, Tensor) else Tensor(other)
         return self.data == other.data
-    
+
     def __ge__(self, other):
         other = other if isinstance(other, Tensor) else Tensor(other)
         return self.data >= other.data
     
-    def __lt__(self, other):
+    def __le__(self, other):
         other = other if isinstance(other, Tensor) else Tensor(other)
         return self.data <= other.data
     
+    def __lt__(self, other):
+        other = other if isinstance(other, Tensor) else Tensor(other)
+        return self.data < other.data
+
+    def __gt__(self, other):
+        other = other if isinstance(other, Tensor) else Tensor(other)
+        return self.data > other.data
+       
     def __repr__(self):
         """
         Return a string representation of the Tensor object.
         """
-        return f"Tensor(data= ({str(self.data)}), grad=({str(self.grad)}))"
+        return f"Tensor (data={str(self.data)})"
