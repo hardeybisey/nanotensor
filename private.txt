@@ -99,3 +99,34 @@ y = y[shuffle_idx]
 This code generates a synthetic dataset using the make_blobs function from the Scikit-learn library. The function generates a dataset of blobs with a specified number of samples and centers. In this example, we generate 1000 normal data samples and 100 anomalous data samples. We then shift the anomalous data by 10 units on the x-axis to make it different from the normal data. Finally, we combine the normal and anomalous data and shuffle the dataset to create a random order of samples.
 
 You can modify this code to generate synthetic data using other methods mentioned earlier.
+
+
+Simulation: You can simulate anomalous events or patterns in your data by artificially generating data points that deviate from the normal behavior of the system or data stream. For example, you can simulate sudden spikes or drops in a time series data by generating random values that are outside the normal range of the data. You can also simulate network attacks or anomalies by generating traffic patterns that are not typically seen in normal network traffic.
+
+Modification: You can modify existing data to create anomalous data points. For example, you can modify normal network traffic data by injecting abnormal traffic patterns, such as port scanning or brute force attacks.
+
+Combination: You can combine normal and anomalous data to create a synthetic dataset. For example, you can create a dataset that includes normal traffic data and synthetic traffic data that includes network attacks or anomalies.
+
+Generative models: You can use generative models such as Variational Autoencoders (VAEs) or Generative Adversarial Networks (GANs) to generate synthetic data that resembles the real data distribution. You can then introduce anomalies in the synthetic data to create a dataset for anomaly detection.
+
+
+
+predictive maintainance
+import pandas as pd
+import numpy as np
+
+# Generate data
+num_samples = 1000
+num_features = 10
+data = np.random.randn(num_samples, num_features)
+
+# Add time stamps to data
+time_stamps = pd.date_range('2022-01-01', periods=num_samples, freq='H')
+data_df = pd.DataFrame(data, columns=[f'feature_{i+1}' for i in range(num_features)], index=time_stamps)
+
+# Add labels to data
+failure_date = '2022-01-14'
+data_df['label'] = np.where(data_df.index < failure_date, 0, 1)
+
+# Save data to file
+data_df.to_csv('predictive_maintenance_data.csv', index=False)
