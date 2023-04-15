@@ -1,4 +1,7 @@
 https://jalammar.github.io/
+mynewworkemail25
+myname123@
+
 
 can you give me three solid projects I can work on to include on my CV as a data engineer with a masters degree in data science and  interest in machine learning. I want the projects to span across these three fields
 
