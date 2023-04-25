@@ -206,4 +206,4 @@ class Tensor:
         """
         Return a string representation of the Tensor object.
         """
-        return f"Tensor (data={str(self.data)})"
+        return f"Tensor ({str(self.data)})"
